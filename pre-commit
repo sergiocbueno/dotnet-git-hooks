@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+
+yellow='\033[0;33m'
+no_color='\033[0m'
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$branch" = "master" ] || [ "$branch" = "staging" ] || [ "$branch" = "development" ]; then
+  echo -e ${yellow}
+  echo "Not allowed! You can not create commit directly into $branch branch"
+  echo -e ${no_color}
+  exit 1
+fi
+
+exit 0

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+set -e
+
+yellow='\033[0;33m'
+no_color='\033[0m'
+green='\033[0;32m'
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$branch" = "master" ] || [ "$branch" = "staging" ] || [ "$branch" = "development" ]; then
+  echo -e ${yellow}
+  echo "Not allowed! You can not push changes directly into $branch branch"
+  echo -e ${no_color}
+  exit 1
+fi
+
+if [ -d *-test ] && [ -f ./*-test/*-test.csproj ]; then
+  cd *-test
+  dotnet test
+  if [ $? = 0 ]; then
+    echo -e ${green}
+    echo "All unit tests passed successfully!"
+    echo -e ${no_color}
+    exit 0
+  fi
+  echo -e ${yellow}
+  echo "Not allowed! There are unit tests failing, please fix them before push into $branch branch!"
+  echo -e ${no_color}
+  exit 1 
+else
+  echo -e ${yellow}
+  echo "No unit tests were found to be run!"
+  echo -e ${no_color}
+fi
+
+exit 0

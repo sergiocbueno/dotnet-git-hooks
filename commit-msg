@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -e
+
+yellow='\033[0;33m'
+no_color='\033[0m'
+
+commit_message=$(head -n1 $1)
+branch_name="$(git rev-parse --abbrev-ref HEAD)"
+ticket=$(echo $commit_message | sed -nE 's,\[([A-Z]+-[0-9]+)].+,\1,p')
+
+if [ -z "$ticket" ]; then
+  echo -e ${yellow}
+  echo "Invalid commit message, no ticket found! Commit message sample: [<ticket-id>] <commit-message-here>"
+  echo -e ${no_color}
+  exit 1
+fi
+
+if [ "$ticket" != "$branch_name" ]; then
+  echo -e ${yellow}
+  echo "Invalid ticket! Your commit message contains a ticket [$ticket] which does not match with your branch [$branch_name]"
+  echo -e ${no_color}
+  exit 1
+fi
+
+exit 0
